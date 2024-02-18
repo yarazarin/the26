@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const sharp = require('sharp');
+const stream = require('stream');
 
 const multer = require("multer");
 const {
@@ -68,8 +70,27 @@ app.get("/getObject/:key", async (req, res) => {
   try {
     const command = new GetObjectCommand({ Bucket: "the26", Key: key });
     const data = await s3Client.send(command);
-    // res.send(data.Body.toString());
-    data.Body.pipe(res);// Pipe the data to the response
+
+    // Create a transform stream to resize the image
+    const transform = sharp().resize({
+      width: 300,
+      height: 400,
+      fit: sharp.fit.cover,
+      position: sharp.strategy.entropy
+    });
+
+    // Use a PassThrough stream to avoid prematurely closing the Readable stream
+    const passThrough = new stream.PassThrough();
+
+    // Pipe the data to the transform stream and then to the response
+    stream.pipeline(data.Body, transform, passThrough, err => {
+      if (err) {
+        console.error('Error while transforming image:', err);
+        res.status(500).send('Error while transforming image');
+      }
+    });
+
+    passThrough.pipe(res);
   } catch (err) {
     console.error("Error retrieving object:", err);
     res.status(500).send("Error retrieving object");
