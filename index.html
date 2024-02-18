@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS S3 File Management</title>
+    <style>
+        body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #f4f4f4;
+}
+h1 {
+  color: #333;
+  margin-bottom: 20px;
+}
+.file-upload-form {
+  margin-bottom: 20px;
+}
+.file-upload-form input[type="file"] {
+  margin-right: 10px;
+}
+.file-upload-form button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.object-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.object-list-item {
+  background-color: #fff;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.object-list-item a {
+  color: #007bff;
+  text-decoration: none;
+}
+    </style>
+</head>
+<body>
+    <h1>AWS S3 File Management</h1>
+    
+    <!-- Form to upload a file -->
+    <form class="file-upload-form" action="http://localhost:3000/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <button type="submit">Upload File</button>
+    </form>
+
+    <!-- List of objects in the bucket -->
+    <h2>Objects in the Bucket</h2>
+    <ul class="object-list">
+        <!-- Object list items will be dynamically added here -->
+    </ul>
+
+    <!-- Form to retrieve an object from the bucket -->
+    <form id="retrieve-object-form">
+        <input type="text" id="object-key" placeholder="Enter object key">
+        <button type="submit">Retrieve Object</button>
+    </form>
+
+    <script>
+        // JavaScript content from script.js goes here
+        // Function to retrieve objects from the bucket
+        async function retrieveObject() {
+            const objectKey = document.getElementById('object-key').value;
+            const response = await fetch(`http://localhost:3000/getObject/${objectKey}`);
+            const data = await response.text();
+            alert(data); // For demonstration, display the retrieved object data in an alert
+        }
+
+        // Event listener for the retrieve object form submission
+        document.getElementById('retrieve-object-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+            retrieveObject(); // Call the retrieveObject function
+        });
+
+        // Function to fetch and display the list of objects in the bucket
+        async function listObjects() {
+            const response = await fetch('http://localhost:3000/listObjects');
+            const data = await response.json();
+            const objectList = document.querySelector('.object-list');
+            objectList.innerHTML = ''; // Clear previous list items
+            data.forEach(objectKey => {
+                const listItem = document.createElement('li');
+                listItem.textContent = objectKey;
+                listItem.classList.add('object-list-item');
+                objectList.appendChild(listItem);
+            });
+        }
+
+        // Call the listObjects function when the page loads to fetch and display the initial list of objects
+        window.addEventListener('load', listObjects);
+    </script>
+</body>
+</html>
