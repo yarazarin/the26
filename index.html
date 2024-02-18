@@ -51,7 +51,7 @@ h1 {
     <h1>AWS S3 File Management</h1>
     
     <!-- Form to upload a file -->
-    <form class="file-upload-form" action="http://localhost:3000/upload" method="post" enctype="multipart/form-data">
+    <form class="file-upload-form" action="http://ec2-34-230-57-124.compute-1.amazonaws.com/upload" method="post" enctype="multipart/form-data">
         <input type="file" name="file">
         <button type="submit">Upload File</button>
     </form>
@@ -73,7 +73,7 @@ h1 {
         // Function to retrieve objects from the bucket
         async function retrieveObject() {
             const objectKey = document.getElementById('object-key').value;
-            const response = await fetch(`http://localhost:3000/getObject/${objectKey}`);
+            const response = await fetch(`http://ec2-34-230-57-124.compute-1.amazonaws.com/getObject/${objectKey}`);
             const data = await response.text();
             alert(data); // For demonstration, display the retrieved object data in an alert
         }
@@ -86,7 +86,7 @@ h1 {
 
         // Function to fetch and display the list of objects in the bucket
         async function listObjects() {
-            const response = await fetch('http://localhost:3000/listObjects');
+            const response = await fetch('http://ec2-34-230-57-124.compute-1.amazonaws.com/listObjects');
             const data = await response.json();
             const objectList = document.querySelector('.object-list');
             objectList.innerHTML = ''; // Clear previous list items
