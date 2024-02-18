@@ -45,6 +45,10 @@ app.get("/listObjects", async (req, res) => {
 app.post("/upload", upload.single("file"), async (req, res) => {
   try {
     const file = req.file;
+    // Check if the file is an image
+    if (!file.mimetype.startsWith('image/')) {
+      return res.status(400).send('Please upload an image file');
+    }
     const uploadParams = {
       Bucket: "the26",
       Key: file.originalname,
@@ -64,7 +68,8 @@ app.get("/getObject/:key", async (req, res) => {
   try {
     const command = new GetObjectCommand({ Bucket: "the26", Key: key });
     const data = await s3Client.send(command);
-    res.send(data.Body.toString());
+    // res.send(data.Body.toString());
+    data.Body.pipe(res);// Pipe the data to the response
   } catch (err) {
     console.error("Error retrieving object:", err);
     res.status(500).send("Error retrieving object");
